@@ -22,8 +22,11 @@ export class Conta {
   #titular;
 
   constructor(numero, titular) {
-    this.numero = numero;
-    this.titular = titular; 
+   if (new.target === Conta) {
+     throw new Error('Conta é abstrata: crie ContaCorrente ou ContaPoupanca');
+   }
+   this.numero = numero;
+   this.titular = titular; // passa pelo setter abaixo
   }
 
   get saldo() {
@@ -57,5 +60,12 @@ export class Conta {
     this.#saldo -= valor;
   }
 
+  tarifaMensal() {
+    throw new Error('tarifaMensal() precisa ser implementado na subclasse');
+  }
+
+  toString() {
+    return `${this.constructor.name} ${this.numero} · ${this.titular} · R$ ${this.saldo.toFixed(2)}`;
+  }
 }
 
