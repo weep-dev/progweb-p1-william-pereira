@@ -5,10 +5,8 @@
 **Aluno(a):** [William Pereira de Almeida]
 **Disciplina:** Programacao Web · Prof. Rodrigo Alves Costa
 
-## Sobre
+## FitPlan
 
-Aplicacao fullstack (API Express em camadas + SQLite + frontend Bootstrap com Vanilla JS).
+O FitPlan é um sistema de gerenciamento de treinos físicos. O projeto permite cadastrar usuários, exercícios e treinos personalizados, além de organizar os exercícios de cada treino com séries, repetições e ordem de execução.
 
-## Estrutura
-
-- `s1/` exercicios da Semana 1: os quatro pilares da POO em JavaScript.
+A modelagem do sistema está documentada no arquivo [MODELAGEM.md](MODELAGEM.md), que apresenta as entidades, seus relacionamentos e a aplicação dos princípios SRP e DIP.
