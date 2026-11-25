@@ -1,6 +1,7 @@
 
 import * as usuarioModel from '../models/usuarioModel.js';
 import { erro } from '../utils/erro.js';
+import * as treinoModel from '../models/treinoModel.js';
 
 export function listarUsuarios() {
     return usuarioModel.listar();
@@ -51,9 +52,17 @@ export function atualizarUsuario(id, dados) {
 }
 
 export function removerUsuario(id) {
-    const removido = usuarioModel.remover(id);
+    const usuario = usuarioModel.buscarPorId(id);
 
-    if (!removido) {
+    if (!usuario) {
         throw erro(404, 'Usuário não encontrado');
     }
+
+    const treinos = treinoModel.listarPorUsuario(id);
+
+    if (treinos.length > 0) {
+        throw erro(409, 'Usuário possui treinos. Remova os treinos primeiro.');
+    }
+
+    usuarioModel.remover(id);
 }

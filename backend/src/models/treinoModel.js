@@ -1,30 +1,33 @@
 
-const treinos = [];
-let proximoId = 1;
+import { db } from '../db.js';
+
+const COLUNAS = `
+    id,
+    nome,
+    descricao,
+    usuario_id AS usuarioId
+`;
 
 export function listar() {
-    return treinos;
+    return db.prepare(`SELECT ${COLUNAS} FROM treinos ORDER BY id`).all();
 }
 
 export function buscarPorId(id) {
-    return treinos.find(treino => treino.id === id);
+    return db.prepare(`SELECT ${COLUNAS} FROM treinos WHERE id = ?`).get(id) ?? null;
 }
 
 export function listarPorUsuario(usuarioId) {
-    return treinos.filter(treino => treino.usuarioId === usuarioId);
+    return db
+        .prepare(`SELECT ${COLUNAS} FROM treinos WHERE usuario_id = ? ORDER BY id`)
+        .all(usuarioId);
 }
 
 export function criar(dados) {
-    const novoTreino = {
-        id: proximoId++,
-        nome: dados.nome,
-        descricao: dados.descricao,
-        usuarioId: dados.usuarioId
-    };
+    const resultado = db
+        .prepare('INSERT INTO treinos (nome, descricao, usuario_id) VALUES (?, ?, ?)')
+        .run(dados.nome, dados.descricao ?? null, dados.usuarioId);
 
-    treinos.push(novoTreino);
-
-    return novoTreino;
+    return buscarPorId(resultado.lastInsertRowid);
 }
 
 export function atualizar(id, dados) {
@@ -34,20 +37,16 @@ export function atualizar(id, dados) {
         return null;
     }
 
-    treino.nome = dados.nome;
-    treino.descricao = dados.descricao;
+    db.prepare('UPDATE treinos SET nome = ?, descricao = ? WHERE id = ?')
+        .run(dados.nome, dados.descricao ?? null, id);
 
-    return treino;
+    return buscarPorId(id);
 }
 
 export function remover(id) {
-    const indice = treinos.findIndex(treino => treino.id === id);
+    const resultado = db
+        .prepare('DELETE FROM treinos WHERE id = ?')
+        .run(id);
 
-    if (indice === -1) {
-        return false;
-    }
-
-    treinos.splice(indice, 1);
-
-    return true;
+    return resultado.changes > 0;
 }
