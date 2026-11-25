@@ -1,29 +1,24 @@
 
-const usuarios = [];
-let proximoId = 1;
+import { db } from '../db.js';
 
 export function listar() {
-    return usuarios;
+    return db.prepare('SELECT * FROM usuarios ORDER BY id').all();
 }
 
 export function buscarPorId(id) {
-    return usuarios.find(usuario => usuario.id === id);
+    return db.prepare('SELECT * FROM usuarios WHERE id = ?').get(id) ?? null;
 }
 
 export function buscarPorEmail(email) {
-    return usuarios.find(usuario => usuario.email === email);
+    return db.prepare('SELECT * FROM usuarios WHERE email = ?').get(email) ?? null;
 }
 
 export function criar(dados) {
-    const novoUsuario = {
-        id: proximoId++,
-        nome: dados.nome,
-        email: dados.email
-    };
+    const resultado = db
+        .prepare('INSERT INTO usuarios (nome, email) VALUES (?, ?)')
+        .run(dados.nome, dados.email);
 
-    usuarios.push(novoUsuario);
-
-    return novoUsuario;
+    return buscarPorId(resultado.lastInsertRowid);
 }
 
 export function atualizar(id, dados) {
@@ -33,20 +28,16 @@ export function atualizar(id, dados) {
         return null;
     }
 
-    usuario.nome = dados.nome;
-    usuario.email = dados.email;
+    db.prepare('UPDATE usuarios SET nome = ?, email = ? WHERE id = ?')
+        .run(dados.nome, dados.email, id);
 
-    return usuario;
+    return buscarPorId(id);
 }
 
 export function remover(id) {
-    const indice = usuarios.findIndex(usuario => usuario.id === id);
+    const resultado = db
+        .prepare('DELETE FROM usuarios WHERE id = ?')
+        .run(id);
 
-    if (indice === -1) {
-        return false;
-    }
-
-    usuarios.splice(indice, 1);
-
-    return true;
+    return resultado.changes > 0;
 }

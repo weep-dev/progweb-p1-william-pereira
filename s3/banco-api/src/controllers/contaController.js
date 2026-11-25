@@ -10,8 +10,8 @@ export const contaController = {
   },
 
   criar(req, res) {
-    const nova = contaService.criar(req.body);
-    res.status(201).json(nova);
+    const novo = contaService.criar(req.body);
+    res.status(201).json(novo);
   },
 
   atualizar(req, res) {
